@@ -1,6 +1,6 @@
-# Welcome to the Landdox Code Challenge :)
+# Welcome to the Coati Labs React Code Challenge :)
 
-You have been invited to take the Landdox React Code Challenge. We are not worried about the completion of the challenge. We just want to see an example of your work and then talk about your code.
+You have been invited to take the Coati Labs React Code Challenge. We are not worried about the completion of the challenge. We just want to see an example of your work and then talk about your code.
 
 We expect you to spend around ~2 hours on the challenge. Feel free to spend more or less depending on your progress and your satisfaction with the results.
 
