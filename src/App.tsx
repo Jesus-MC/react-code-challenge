@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Container, Jumbotron, Row } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,6 +7,18 @@ import './App.css';
 
 import EditTractOwnership from './EditTractOwnership';
 import Icon from './Icon';
+
+export type TractOwnerShips = {
+  id: string;
+  owner: string;
+  interest: number; 
+  lease: string; 
+  npris: {
+    id: string; 
+    owner: string; 
+    interest: number;
+  }[];
+}
 
 const tractOwnerships = [
   {
@@ -30,6 +42,17 @@ const tractOwnerships = [
 ];
 
 function App() {
+
+  const [ tractData, setTractData ] = useState<TractOwnerShips[]>([]);
+  
+  useEffect(() => {
+    setTractData(tractOwnerships);
+  }, [])
+  
+  const handleChange = () => {
+
+  }
+
   return (
     <Container>
       <Row>
@@ -43,7 +66,7 @@ function App() {
       </Row>
       <Row>
         <Col>
-          <EditTractOwnership value={tractOwnerships} />
+          <EditTractOwnership value={tractData} onChange={handleChange}/>
         </Col>
       </Row>
     </Container>

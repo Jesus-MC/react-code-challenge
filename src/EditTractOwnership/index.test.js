@@ -2,7 +2,7 @@ import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { render, fireEvent, screen } from '@testing-library/react';
 
-import EditTractOwnership from './';
+import EditTractOwnership from '.';
 
 describe('EditTractOwnership', () => {
   test('Should render without a value', () => {
