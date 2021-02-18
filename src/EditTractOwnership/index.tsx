@@ -12,7 +12,7 @@ const EditTractOwnership: React.FC<Props> = ({
   ) => {
   return (
     <h2>
-      TODO
+      TODO (WIP)
     </h2>
   );
 };
