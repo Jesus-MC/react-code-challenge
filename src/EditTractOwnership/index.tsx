@@ -7,15 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
   value?: TractOwnerShips[];
-  handleAddNPRI: () => void;
   handleRemove:(id: string) => any;
-  handleSave: (values: any) => any;
-  handleUpdate: (tractValues: any) => any;
+  handleSave: (values: TractOwnerShips) => any;
+  handleUpdate: (tractValues: TractOwnerShips, index: number) => any;
 }
 
 const EditTractOwnership: React.FC<Props> = ({
   value,
-  handleAddNPRI,
   handleRemove,
   handleSave,
   handleUpdate
@@ -24,15 +22,16 @@ const EditTractOwnership: React.FC<Props> = ({
 
   const [ singleTractData, setSingleTractData ] = useState({
     owner: '', 
-    interest: '', 
+    interest: 0, 
     lease: '',
     npri_owner: '', 
-    npri_interest: '' 
+    npri_interest: ''
   })
 
-  const [ npriData, setNpriData ] = useState(0);
-  const [ tractId, setTractId ] = useState('');
-  const [ uploadBtn, setUploadBtn ] = useState(false); 
+  const [ npriData, setNpriData ] = useState<number>(0);
+  const [ tractId, setTractId ] = useState<string>('');
+  const [ uploadBtn, setUploadBtn ] = useState<boolean>(false); 
+  const [dataIndex, setDataIndex] = useState<number>(0);
 
   useEffect(() => {
     
@@ -44,24 +43,31 @@ const EditTractOwnership: React.FC<Props> = ({
   const npri_ownerRef = useRef<HTMLInputElement>(null);
   const npri_interestRef = useRef<HTMLInputElement>(null);
 
-  const { owner, interest, lease, npri_owner, npri_interest } = singleTractData;
+  const { owner, interest, lease, npri_owner, npri_interest, } = singleTractData;
 
-  const setData = (id: string) => {
+  const setData = (id: string, index: number) => {
     setUploadBtn(true);
     setTractId(id);
-    const tractData: any = value?.find((item: any) => item.id === id)    
-    // @ts-ignore
-    ownerRef.current.value = tractData.owner;
-    // @ts-ignore
-    interestRef.current.value = tractData.interest;
-    // @ts-ignore
-    leaseRef.current.value = tractData.lease;
-    Object.keys(tractData.npris).map((key: any) => {  
-      // @ts-ignore    
-    npri_ownerRef.current.value = tractData.npris[key].npri_owner;
-    // @ts-ignore
-    npri_interestRef.current.value = tractData.npris[key].npri_interest;
-    });
+    setDataIndex(index);
+    const tractData: any = value?.find((item: any) => item.id === id)
+    try { 
+      // @ts-ignore
+      ownerRef.current.value = tractData.owner;
+      // @ts-ignore
+      interestRef.current.value = tractData.interest;
+      // @ts-ignore
+      leaseRef.current.value = tractData.lease;
+      Object.keys(tractData.npris).map((key: any) => {
+        // @ts-ignore    
+        npri_ownerRef.current.value = tractData.npris[key].npri_owner;
+        // @ts-ignore
+        npri_interestRef.current.value = tractData.npris[key].npri_interest;
+        
+      });
+    } catch (error) {
+      alert(error)
+    }
+    
     setSingleTractData(tractData);
   }
 
@@ -71,7 +77,6 @@ const EditTractOwnership: React.FC<Props> = ({
       [e.target.name]: e.target.value
     })
   }
-
 
   const onSubmit = (e: any) => {    
     e.preventDefault();
@@ -95,22 +100,61 @@ const EditTractOwnership: React.FC<Props> = ({
         interest: interest,
         lease: lease,
         npris: [{
-          npri_owner: singleTractData.npri_owner,
-          npri_interest: singleTractData.npri_interest
+          npri_owner: npri_owner,
+          npri_interest: npri_interest
         }]
       }
-      tractValues.id = tractId;
-      Object.keys(tractValues.npris).map((key: any) => tractValues.npris[key].npri_id = uuidv4());
-      handleUpdate(tractValues);
+      handleUpdate(tractValues, dataIndex);
       setUploadBtn(false);
       resetFormFields();
-      
     }  
   }
-  
-  const addNpriRow = () => {
-    setNpriData(npriData +1)
-  }
+
+  const moreFields = (npriData > 0) ? 
+    <Row>
+      <Col md={3}>
+        <div className=''>
+          <Row>
+            <Col sm={1}>
+            <Icon icon="indent" />
+            </Col>
+            <Col>
+              <Form.Control
+                type='text' 
+                placeholder='NPRI Owner' 
+                name='npri_owner1' 
+                onChange={handleChange}
+              />
+            </Col>
+          </Row>
+        </div>  
+      </Col>
+      <Col md={3}></Col>
+      <Col md={3}>            
+        <InputGroup className="mb-3">
+            <Form.Control
+              type='text'
+              placeholder="NPRI Interest"
+              name='npri_interest1'
+              onChange={handleChange}
+            />
+            <InputGroup.Append>
+              <InputGroup.Text>%</InputGroup.Text>
+            </InputGroup.Append>
+        </InputGroup>
+      </Col>
+      <Col md={3}>
+        <Row>
+          <Col></Col>
+          <Col sm={3}>
+            <Button variant="outline-dark" className='btn-remove' onClick={() => setNpriData(npriData -1)}>
+              <Icon icon='remove'/>
+            </Button>
+          </Col>
+        </Row>
+      </Col>
+    </Row> 
+    : null;
 
   const resetFormFields = () => {
     // @ts-ignore
@@ -125,16 +169,17 @@ const EditTractOwnership: React.FC<Props> = ({
     npri_interestRef.current.value = '';
     setSingleTractData({
       owner: '', 
-      interest: '', 
+      interest: 0, 
       lease: '',
       npri_owner: '', 
-      npri_interest: '' 
+      npri_interest: ''
     });
+    setUploadBtn(false);
   }
 
   return (
     <Container>
-      <form onSubmit={onSubmit} >
+      <form onSubmit={onSubmit} className='mb-3'>
         <Row>
           <Col md={3}><p>Owner</p></Col>
           <Col md={3}><p>Mineral Interest</p></Col>
@@ -150,7 +195,6 @@ const EditTractOwnership: React.FC<Props> = ({
               name='owner' 
               onChange={handleChange} 
               ref={ownerRef}
-              //value={ownerRef}
             />
           </Col>
           <Col md={3}>
@@ -162,7 +206,6 @@ const EditTractOwnership: React.FC<Props> = ({
                 name='interest'
                 onChange={handleChange}
                 ref={interestRef}
-                //value={interestRef}
               />
               <InputGroup.Append>
                 <InputGroup.Text>%</InputGroup.Text>
@@ -179,7 +222,6 @@ const EditTractOwnership: React.FC<Props> = ({
               name='lease' 
               onChange={handleChange} 
               ref={leaseRef}
-              //value={leaseRef}
             />
           </Col>
         </Row>
@@ -192,14 +234,12 @@ const EditTractOwnership: React.FC<Props> = ({
                 <Icon icon="indent" />
                 </Col>
                 <Col>
-                  <Form.Control 
-                    required 
+                  <Form.Control
                     type='text' 
                     placeholder='NPRI Owner' 
                     name='npri_owner' 
                     onChange={handleChange} 
                     ref={npri_ownerRef}
-                    //value={npri_ownerRef}
                   />
                 </Col>
               </Row>
@@ -209,39 +249,39 @@ const EditTractOwnership: React.FC<Props> = ({
           <Col md={3}>            
             <InputGroup className="mb-3">
                 <Form.Control
-                  required
                   type='text'
                   placeholder="NPRI Interest"
                   name='npri_interest'
                   onChange={handleChange}
                   ref={npri_interestRef}
-                  //value={npri_interestRef}
                 />
                 <InputGroup.Append>
                   <InputGroup.Text>%</InputGroup.Text>
                 </InputGroup.Append>
             </InputGroup>
           </Col>
-          <Col md={3}>
-            <Row>
-              <Col></Col>
-              <Col sm={3}>
-                <Button variant="outline-dark" className='btn-remove'>
-                  <Icon icon='remove'/>
-                </Button>
-              </Col>
-            </Row>
-          </Col>
         </Row>
+
+        { moreFields }
 
         <Row>
           <Col md={3}>
             <div className='btn-container'>
-              <Button variant="outline-dark" className='btn-add' onClick={addNpriRow}>
-                <Icon icon="add" />
-                Add NPRI
+              <Button variant="outline-dark" className='btn-add' onClick={resetFormFields}>
+                Clear Fields
               </Button>
             </div>
+            {/*
+              (npriData <= 0) ? 
+              <div className='btn-container'>
+                <Button variant="outline-dark" className='btn-add' onClick={() => setNpriData(npriData +1)}>
+                  <Icon icon="add" />
+                  Add NPRI
+                </Button>
+              </div>
+              : null
+            */}
+            
           </Col>
           <Col md={9}>
             { uploadBtn ? 
@@ -256,9 +296,9 @@ const EditTractOwnership: React.FC<Props> = ({
       
       { value!.length === 0 ? 
         <Jumbotron className='mb-3'>          
-          <h2 className='data-label'>No hay datos</h2>
+          <h2 className='data-label'>No data</h2>
         </Jumbotron> :
-        <Table striped bordered hover className='data-table'>
+        <Table striped bordered hover variant="dark" className='data-table'>
           <thead>
             <tr>
               <th>Owner</th>
@@ -268,14 +308,14 @@ const EditTractOwnership: React.FC<Props> = ({
             </tr>
           </thead>
           {
-            value!.map((item: TractOwnerShips) =>
-              <tbody>
-                <tr key={item.id}>
+            value!.map((item: TractOwnerShips, index: number) =>
+              <tbody key={item.id}>
+                <tr>
                   <td>{item.owner ? item.owner : 'N/A'}</td>
                   <td>{item.interest ? item.interest : 'N/A'}</td>
                   <td>{item.lease ? item.lease : 'N/A'}</td>
                   <td>
-                    <Button variant="outline-primary" onClick={() => setData(item!.id!)}>See data</Button>
+                    <Button variant="outline-primary" onClick={() => setData(item!.id!, index)}>See data</Button>
                     <Button variant="outline-danger" className='btn-delete' onClick={() => handleRemove(item!.id!)}>Delete</Button>
                   </td>
                 </tr>

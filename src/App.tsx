@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Container, Jumbotron, Row, Alert } from 'react-bootstrap';
+import { Col, Container, Jumbotron, Row } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -42,34 +42,16 @@ let tractOwnerships: any = [{
   },
   {
     id: uuidv4(),
-    owner: 'non Luke',
-    interest: 15,
-    lease: 'non Tatooine Lease',
+    owner: 'Steve Rogers',
+    interest: 115,
+    lease: 'James Barnes',
     npris: [
       {
         npri_id: uuidv4(),
-        npri_owner: 'non Leia Organa',
-        npri_interest: 0.45,
-      },
-      {
-        npri_id: uuidv4(),
-        npri_owner: ' non Han Solo',
-        npri_interest: 0.15,
-      },
+        npri_owner: 'Sam Wilson',
+        npri_interest: 22,
+      }
     ],
-  },
-    {
-      id: uuidv4(),
-      owner: 'fosi',
-      interest: 115,
-      lease: 'none',
-      npris: [
-        {
-          npri_id: uuidv4(),
-          npri_owner: 'void',
-          npri_interest: 22,
-        }
-      ],
 }];
 
 function App() {
@@ -86,27 +68,21 @@ function App() {
       alert(error)
     }
   }, [tractData])
-  
 
-  const handleAddNPRI = () => {
-    console.log('handleAddNPRI')
-  }
-
-  const handleSave = (values: any) => {
-    console.log(values)
+  const handleSave = (values: TractOwnerShips) => {
     setTractData([ ...tractData, values ])
   }
   
   const handleRemove = (id: string) => {
     const newTract = tractData.filter((item: any) => item.id !== id);
     setTractData(newTract);
-    console.log('handleRemove')
+    alert('Deleted data');
   }
 
-  const handleUpdate = (values: any) => {
-    console.log(values, 'update')
-    const newTract = tractData.find((item: any) =>item.id === values.id)
-    alert('update');
+  const handleUpdate = (values: TractOwnerShips, index: number) => {
+    tractData.splice(index, 1, values)
+    setTractData(tractData);
+    alert('Updated data');
   }
 
   return (
@@ -123,8 +99,7 @@ function App() {
       <Row>
         <Col>
           <EditTractOwnership 
-            value={tractData} 
-            handleAddNPRI={handleAddNPRI}
+            value={tractData}
             handleSave={handleSave}
             handleRemove={handleRemove}
             handleUpdate={handleUpdate}/>
