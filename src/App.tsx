@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Container, Jumbotron, Row } from 'react-bootstrap';
+import { Col, Container, Jumbotron, Row, Alert } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -9,48 +9,104 @@ import EditTractOwnership from './EditTractOwnership';
 import Icon from './Icon';
 
 export type TractOwnerShips = {
-  id: string;
-  owner: string;
-  interest: number; 
-  lease: string; 
-  npris: {
-    id: string; 
-    owner: string; 
-    interest: number;
-  }[];
+  id?: string;
+  owner?: string;
+  interest?: number; 
+  lease?: string; 
+  npris?: NPRIsData[];
 }
 
-const tractOwnerships = [
-  {
-    id: uuidv4(),
+export type NPRIsData = {
+  npri_id?: string; 
+  npri_owner?: string; 
+  npri_interest?: number;  
+}
+
+let tractOwnerships: any = [{
+  id: uuidv4(),
     owner: 'Luke Skywalker',
     interest: 0.5,
     lease: 'Tatooine Lease',
     npris: [
       {
-        id: uuidv4(),
-        owner: 'Leia Organa',
-        interest: 0.45,
+        npri_id: uuidv4(),
+        npri_owner: 'Leia Organa',
+        npri_interest: 0.45,
       },
       {
-        id: uuidv4(),
-        owner: 'Han Solo',
-        interest: 0.15,
+        npri_id: uuidv4(),
+        npri_owner: 'Han Solo',
+        npri_interest: 0.15,
       },
     ],
   },
-];
+  {
+    id: uuidv4(),
+    owner: 'non Luke',
+    interest: 15,
+    lease: 'non Tatooine Lease',
+    npris: [
+      {
+        npri_id: uuidv4(),
+        npri_owner: 'non Leia Organa',
+        npri_interest: 0.45,
+      },
+      {
+        npri_id: uuidv4(),
+        npri_owner: ' non Han Solo',
+        npri_interest: 0.15,
+      },
+    ],
+  },
+    {
+      id: uuidv4(),
+      owner: 'fosi',
+      interest: 115,
+      lease: 'none',
+      npris: [
+        {
+          npri_id: uuidv4(),
+          npri_owner: 'void',
+          npri_interest: 22,
+        }
+      ],
+}];
 
 function App() {
+  if (!tractOwnerships) {
+    tractOwnerships = [];
+  }
 
-  const [ tractData, setTractData ] = useState<TractOwnerShips[]>([]);
+  const [ tractData, setTractData ] = useState<TractOwnerShips[]>(tractOwnerships ? tractOwnerships : []);
   
   useEffect(() => {
-    setTractData(tractOwnerships);
-  }, [])
-  
-  const handleChange = () => {
+    try{
 
+    } catch(error) {
+      alert(error)
+    }
+  }, [tractData])
+  
+
+  const handleAddNPRI = () => {
+    console.log('handleAddNPRI')
+  }
+
+  const handleSave = (values: any) => {
+    console.log(values)
+    setTractData([ ...tractData, values ])
+  }
+  
+  const handleRemove = (id: string) => {
+    const newTract = tractData.filter((item: any) => item.id !== id);
+    setTractData(newTract);
+    console.log('handleRemove')
+  }
+
+  const handleUpdate = (values: any) => {
+    console.log(values, 'update')
+    const newTract = tractData.find((item: any) =>item.id === values.id)
+    alert('update');
   }
 
   return (
@@ -66,7 +122,12 @@ function App() {
       </Row>
       <Row>
         <Col>
-          <EditTractOwnership value={tractData} onChange={handleChange}/>
+          <EditTractOwnership 
+            value={tractData} 
+            handleAddNPRI={handleAddNPRI}
+            handleSave={handleSave}
+            handleRemove={handleRemove}
+            handleUpdate={handleUpdate}/>
         </Col>
       </Row>
     </Container>
